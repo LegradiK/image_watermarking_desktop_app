@@ -11,9 +11,10 @@ def imageUploader():
     # if file is selected
     if len(path):
         img = Image.open(path)
+        uploaded_img = uploaded_img.resize((600, 350))
         pic = ImageTk.PhotoImage(img)
 
-        app.geometry('560x300')
+        app.geometry('600x350')
         label.config(image=pic)
         label.image = pic
     # if no file is selected
@@ -31,18 +32,20 @@ if __name__ == '__main__':
     bg_img = Image.open("background.png")         # open image with PIL
     bg_img = bg_img.resize((600, 350))
     img = ImageTk.PhotoImage(bg_img)
-    imgLabel = Label(app, image=img)
-    imgLabel.place(x=0, y=0)
 
-    #add background color to upload button
-    app.option_add('*Label*Background', 'white')
-    app.option_add('*Button*Background', 'white')
+    canvas = tk.Canvas(app, width=600, height=350)
+    canvas.pack()
 
-    label = tk.Label(app)
-    label.pack(pady=10)
+    canvas.create_image(0, 0, image=img, anchor='nw')
+    canvas.image = img
+
+    # overlay text directly on canvas
+    canvas.create_text(300, 50, text='Image Watermaking App',
+                       font=('Arial', 25, 'bold'), fill='darkgrey')
 
     # define upload button
-    uploadButton = tk.Button(app, text='Upload Image', command=imageUploader)
-    uploadButton.pack(side=tk.BOTTOM, pady=20)
+    uploadButton = tk.Button(app, text='Upload Image',
+                             font=('Arial'), command=imageUploader)
+    uploadButton.pack(side=tk.BOTTOM, pady=30)
 
     app.mainloop()
