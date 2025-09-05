@@ -19,3 +19,5 @@ else:
     position = position
 
 apply_watermark(image_path='Lego Star Wars Winter.jpg', watermark_text=watermark_text, font_size=font_size, position=position)
+
+
