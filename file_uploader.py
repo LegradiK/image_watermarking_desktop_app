@@ -5,18 +5,22 @@ from PIL import Image, ImageTk
 
 
 def imageUploader():
-    fileTypes = [('Image files', '*.png;*.jpg;*.jpeg')]
+    fileTypes = [("Image Files", "*.jpg *.jpeg *.png")]
     path = tk.filedialog.askopenfilename(filetypes=fileTypes)
 
     # if file is selected
     if len(path):
-        img = Image.open(path)
-        uploaded_img = uploaded_img.resize((600, 350))
-        pic = ImageTk.PhotoImage(img)
+        for file in path:
+            img = Image.open(path)
+            uploaded_img = img.resize('600x350')
+            pic = ImageTk.PhotoImage(uploaded_img)
 
-        app.geometry('600x350')
-        label.config(image=pic)
-        label.image = pic
+            app.geometry('600x350')
+            # clear canvas and redraw
+            canvas.delete("all")
+            canvas.create_image(0, 0, image=pic, anchor="nw")
+            canvas.image = pic  # keep a reference!
+
     # if no file is selected
     else:
         print('No file is selected')
@@ -46,6 +50,6 @@ if __name__ == '__main__':
     # define upload button
     uploadButton = tk.Button(app, text='Upload Image',
                              font=('Arial'), command=imageUploader)
-    uploadButton.pack(side=tk.BOTTOM, pady=30)
+    uploadButton.place(relx=0.5, rely=0.9, anchor='center')
 
     app.mainloop()
