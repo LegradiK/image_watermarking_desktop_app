@@ -1,5 +1,7 @@
-from watermark import apply_watermark
+import tkinter as tk
+from file_uploader import WatermarkApp
 
+# terminal inputs
 watermark_text = input('Enter the watermark text to personalise your image: ')
 font_size = input('Enter font size as a percentage of the image size (default 10%): ')
 
@@ -18,6 +20,8 @@ if position == '':
 else:
     position = position
 
-apply_watermark(image_path='Lego Star Wars Winter.jpg', watermark_text=watermark_text, font_size=font_size, position=position)
-
+# GUI
+root = tk.Tk()
+app = WatermarkApp(root, watermark_text, font_size, position)
+root.mainloop()
 
