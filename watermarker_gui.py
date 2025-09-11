@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import *
+import tkinter.font as tkFont
 from tkinter import filedialog, messagebox
 from PIL import Image, ImageTk, ImageFont, ImageDraw
 from matplotlib import pyplot as plt
@@ -16,6 +17,7 @@ class WaterMarkerApp():
         self.text = None
         self.font_size = None
         self.position = None
+        self.watermarked_img = None
 
         self.root.title("Image Watermarking Desktop App")
         self.root.geometry(f'{self.screen_width}x{self.screen_height}')
@@ -26,6 +28,8 @@ class WaterMarkerApp():
         self.menu.add_cascade(label='File', menu=self.filemenu)
         self.filemenu.add_command(label='Upload Image', command=self.imageUploader)
         self.filemenu.add_command(label='Watermarking', command=self.waterMarker)
+        self.filemenu.add_command(label="Save", command=self.save, accelerator="Ctrl+S")
+        self.filemenu.add_command(label="Save as...", command=self.save_as, accelerator="Ctrl+Shift+S")
         self.filemenu.add_separator()
         self.filemenu.add_command(label='Exit', command=root.quit)
         self.helpmenu = Menu(self.menu)
@@ -86,7 +90,7 @@ class WaterMarkerApp():
 
         watermarker_window = Toplevel(self.root)
         watermarker_window.title('Add Watermark')
-        watermarker_window.geometry('300x250')
+        watermarker_window.geometry('300x400')
 
         tk.Label(watermarker_window, text='Watermark Text:').pack(pady=5)
         text_var = StringVar()
@@ -95,6 +99,11 @@ class WaterMarkerApp():
         tk.Label(watermarker_window, text='Font Size (% of image):').pack(pady=5)
         size_var = StringVar(value='10')
         tk.Entry(watermarker_window, textvariable=size_var).pack(pady=5)
+
+        tk.Label(watermarker_window, text='Font:').pack(pady=5)
+        font_var = StringVar(value="DejaVuSans")
+        fonts = sorted(set(tkFont.families()))  # get system fonts
+        OptionMenu(watermarker_window, font_var, *fonts).pack(pady=5)
 
         tk.Label(watermarker_window, text='Position:').pack(pady=5)
         position_var = StringVar(value='center')
@@ -108,6 +117,7 @@ class WaterMarkerApp():
         def apply_and_show():
             self.text = text_var.get()
             self.font_size = size_var.get()
+            self.font_family = font_var.get()
             self.position = position_var.get()
 
             if not self.text:
@@ -118,7 +128,15 @@ class WaterMarkerApp():
             except ValueError:
                 self.font_size = None
 
-            watermarked = self.apply_watermark(self.image_path, self.text, self.font_size, self.position)
+            watermarked = self.apply_watermark(
+                self.image_path,
+                self.text,
+                self.font_size,
+                self.font_family,
+                self.position
+                )
+
+            self.watermarked_img = watermarked
 
             display_img = watermarked.copy()
             display_img.thumbnail((self.screen_width, self.screen_height), Image.LANCZOS)
@@ -132,7 +150,7 @@ class WaterMarkerApp():
 
         tk.Button(watermarker_window, text='Apply', command=apply_and_show).pack(pady=15)
 
-    def apply_watermark(self, image_path, text, font_size, position):
+    def apply_watermark(self, image_path, text, font_size, font_family, position):
         # opening the file
         im = Image.open(image_path).convert('RGBA')
         im_w, im_h = im.size
@@ -148,13 +166,16 @@ class WaterMarkerApp():
         # deciding the test_layer and font details
         draw = ImageDraw.Draw(text_layer)
 
-        font_path = '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
 
         if font_size is None:
             font_size = int(min(im_w, im_h) / 10)
         else:
             font_size = int(min(im_w, im_h) * font_size / 100)
-        font = ImageFont.truetype(font_path, font_size)
+
+        try:
+            font = ImageFont.truetype(f'{font_family}.ttf', font_size)
+        except:
+            font = ImageFont.load_default()
 
         positions = {
             "top-left": (im_w * 0.1, im_h * 0.05),
@@ -182,5 +203,37 @@ class WaterMarkerApp():
         draw.text((x, y), text=text, fill=(0, 0, 0, 100), font=font, anchor=anchor)
         # print(im.size)
         # print(text_layer.size)
+
         return Image.alpha_composite(im, text_layer)
 
+
+    def save(self):
+        if self.watermarked_img is None:
+            messagebox.showwarning("No image", "Please apply a watermark before saving.")
+            return
+
+        try:
+            # Save to the last chosen filename
+            self.watermarked_img.save(self.f)
+            messagebox.showinfo("Saved", f"Image saved to {self.f}")
+        except AttributeError:
+            # If no filename exists yet → ask user
+            self.save_as()
+
+    def save_as(self):
+        if self.watermarked_img is None:
+                    messagebox.showwarning("No image", "Please apply a watermark before saving.")
+                    return
+
+        f = filedialog.asksaveasfilename(
+            defaultextension=".png",
+            filetypes=[
+                ("PNG Image", "*.png"),
+                ("JPEG Image", "*.jpg;*.jpeg"),
+                ("All Files", "*.*"),
+            ]
+        )
+        if f:
+            self.watermarked_img.save(f)
+            self.f = f
+            messagebox.showinfo("Saved", f"Image saved to {f}")
