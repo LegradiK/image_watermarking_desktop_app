@@ -1,8 +1,9 @@
 import tkinter as tk
 from tkinter import *
 import tkinter.font as tkFont
+from tkinter import colorchooser
 from tkinter import filedialog, messagebox
-from PIL import Image, ImageTk, ImageFont, ImageDraw
+from PIL import Image, ImageTk, ImageFont, ImageDraw, ImageColor
 from matplotlib import pyplot as plt
 import numpy as np
 
@@ -105,6 +106,15 @@ class WaterMarkerApp():
         fonts = sorted(set(tkFont.families()))  # get system fonts
         OptionMenu(watermarker_window, font_var, *fonts).pack(pady=5)
 
+        tk.Label(watermarker_window, text='Font Colour:').pack(pady=5)
+        color_var = StringVar(value="#000000")  # default black
+        def pick_color():
+            chosen_color = colorchooser.askcolor(title="Pick Watermark Colour")
+            if chosen_color[1]:  # hex code
+                color_var.set(chosen_color[1])
+        tk.Button(watermarker_window, text="Choose Colour", command=pick_color).pack(pady=5)
+
+
         tk.Label(watermarker_window, text='Position:').pack(pady=5)
         position_var = StringVar(value='center')
         positions = [
@@ -118,6 +128,7 @@ class WaterMarkerApp():
             self.text = text_var.get()
             self.font_size = size_var.get()
             self.font_family = font_var.get()
+            self.color = color_var.get()
             self.position = position_var.get()
 
             if not self.text:
@@ -133,6 +144,7 @@ class WaterMarkerApp():
                 self.text,
                 self.font_size,
                 self.font_family,
+                self.color,
                 self.position
                 )
 
@@ -150,7 +162,7 @@ class WaterMarkerApp():
 
         tk.Button(watermarker_window, text='Apply', command=apply_and_show).pack(pady=15)
 
-    def apply_watermark(self, image_path, text, font_size, font_family, position):
+    def apply_watermark(self, image_path, text, font_size, font_family, position='center', color="#000000"):
         # opening the file
         im = Image.open(image_path).convert('RGBA')
         im_w, im_h = im.size
@@ -200,7 +212,8 @@ class WaterMarkerApp():
         else:
             anchor =  'ra'
 
-        draw.text((x, y), text=text, fill=(0, 0, 0, 100), font=font, anchor=anchor)
+        rgba_color = ImageColor.getrgb(color) + (100,)  # add alpha
+        draw.text((x, y), text=text, fill=rgba_color, font=font, anchor=anchor)
         # print(im.size)
         # print(text_layer.size)
 
