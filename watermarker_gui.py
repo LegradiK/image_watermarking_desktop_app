@@ -19,6 +19,7 @@ class WaterMarkerApp():
         self.font_size = None
         self.position = None
         self.watermarked_img = None
+        self.font_color = None
 
         self.root.title("Image Watermarking Desktop App")
         self.root.geometry(f'{self.screen_width}x{self.screen_height}')
@@ -110,9 +111,10 @@ class WaterMarkerApp():
         color_var = StringVar(value="#000000")  # default black
         def pick_color():
             chosen_color = colorchooser.askcolor(title="Pick Watermark Colour")
-            if chosen_color[1]:  # hex code
+            if chosen_color[1]:  # hex colour
                 color_var.set(chosen_color[1])
-        tk.Button(watermarker_window, text="Choose Colour", command=pick_color).pack(pady=5)
+                color_btn.config(text=color_var.get(), bg=color_var.get(), fg='gray')
+        color_btn = tk.Button(watermarker_window, text=color_var.get(),command=pick_color, bg=color_var.get(), fg='gray').pack(pady=5)
 
 
         tk.Label(watermarker_window, text='Position:').pack(pady=5)
@@ -128,8 +130,8 @@ class WaterMarkerApp():
             self.text = text_var.get()
             self.font_size = size_var.get()
             self.font_family = font_var.get()
-            self.color = color_var.get()
             self.position = position_var.get()
+            self.font_color = color_var.get()
 
             if not self.text:
                     messagebox.showwarning("No text", "Please enter watermark text.")
@@ -144,8 +146,8 @@ class WaterMarkerApp():
                 self.text,
                 self.font_size,
                 self.font_family,
-                self.color,
-                self.position
+                self.position,
+                self.font_color
                 )
 
             self.watermarked_img = watermarked
@@ -162,7 +164,7 @@ class WaterMarkerApp():
 
         tk.Button(watermarker_window, text='Apply', command=apply_and_show).pack(pady=15)
 
-    def apply_watermark(self, image_path, text, font_size, font_family, position='center', color="#000000"):
+    def apply_watermark(self, image_path, text, font_size, font_family, position='center', font_color="#000000"):
         # opening the file
         im = Image.open(image_path).convert('RGBA')
         im_w, im_h = im.size
@@ -200,7 +202,7 @@ class WaterMarkerApp():
             "bottom": (im_w / 2, im_h * 0.89),
             "bottom-right": (im_w * 0.87, im_h * 0.89)
         }
-        x, y = positionｓ.get(position.lower(), (im_w / 2, im_h / 2))
+        x, y = positions.get(position.lower(), (im_w / 2, im_h / 2))
 
         left_positions = ['top-left', 'left', 'bottom-left']
         center_positions = ['top', 'center', 'bottom']
@@ -212,7 +214,7 @@ class WaterMarkerApp():
         else:
             anchor =  'ra'
 
-        rgba_color = ImageColor.getrgb(color) + (100,)  # add alpha
+        rgba_color = ImageColor.getrgb(font_color) + (100,) # add transparency
         draw.text((x, y), text=text, fill=rgba_color, font=font, anchor=anchor)
         # print(im.size)
         # print(text_layer.size)
