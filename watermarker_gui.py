@@ -38,11 +38,6 @@ class WaterMarkerApp():
         self.menu.add_cascade(label='Help', menu=self.helpmenu)
         self.helpmenu.add_command(label='About')
 
-        # add background image
-        bg_img = Image.open("background.png")         # open image with PIL
-        bg_img = bg_img.resize((self.screen_width, self.screen_height))
-        self.img = ImageTk.PhotoImage(bg_img)
-
         self.canvas = tk.Canvas(root, width=self.screen_width, height=self.screen_height)
         self.canvas.pack()
 
