@@ -107,14 +107,25 @@ class WaterMarkerApp():
         fonts = sorted(set(tkFont.families()))  # get system fonts
         OptionMenu(watermarker_window, font_var, *fonts).pack(pady=5)
 
-        tk.Label(watermarker_window, text='Font Colour:').pack(pady=5)
-        color_var = StringVar(value="#000000")  # default black
         def pick_color():
             chosen_color = colorchooser.askcolor(title="Pick Watermark Colour")
             if chosen_color[1]:  # hex colour
                 color_var.set(chosen_color[1])
-                color_btn.config(text=color_var.get(), bg=color_var.get(), fg='gray')
-        color_btn = tk.Button(watermarker_window, text=color_var.get(),command=pick_color, bg=color_var.get(), fg='gray').pack(pady=5)
+                color_btn.config(
+                                text=color_var.get(),
+                                bg=color_var.get(),
+                                fg='black' if chosen_color[1].lower() != "#ffffff" else "black"
+                                )
+        tk.Label(watermarker_window, text='Font Colour:').pack(pady=5)
+        color_var = StringVar(value="#000000")  # default black
+        color_btn = tk.Button(
+            watermarker_window,
+            text=color_var.get(),
+            command=pick_color,
+            bg=color_var.get(),
+            fg='white'
+            )
+        color_btn.pack(pady=5)
 
 
         tk.Label(watermarker_window, text='Position:').pack(pady=5)
