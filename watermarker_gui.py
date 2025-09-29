@@ -36,7 +36,7 @@ class WaterMarkerApp():
         self.filemenu.add_command(label='Exit', command=root.quit)
         self.helpmenu = Menu(self.menu)
         self.menu.add_cascade(label='Help', menu=self.helpmenu)
-        self.helpmenu.add_command(label='About')
+        self.helpmenu.add_command(label='About', command=self.open_about)
 
         self.canvas = tk.Canvas(root, width=self.screen_width, height=self.screen_height)
         self.canvas.pack()
@@ -258,3 +258,27 @@ class WaterMarkerApp():
             self.watermarked_img.save(f)
             self.f = f
             messagebox.showinfo("Saved", f"Image saved to {f}")
+
+    def open_about(self):
+        """Open 'About' popup page to show copyright"""
+        about = tk.Toplevel(self.root)  # use self.root as parent
+        about.title('About')
+        about.geometry('400x250')
+        about.resizable(False, False)
+
+        label = tk.Label(
+            about,
+            text='Image Watermarking App\n\n'
+                'Created with Python and Tkinter\n'
+                'Copyright 2025 Kaho L',
+            font=('Arial', 16),
+            justify='center'
+        )
+        label.pack(expand=True, padx=20, pady=20)
+
+        close_button = tk.Button(
+            about,
+            text='Close',
+            command=about.destroy
+        )
+        close_button.pack(pady=10)
