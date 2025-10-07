@@ -270,7 +270,7 @@ class WaterMarkerApp():
             about,
             text='Image Watermarking App\n\n'
                 'Created with Python and Tkinter\n'
-                'Copyright 2025 Kaho L',
+                'Copyright 2025 LegradiK',
             font=('Arial', 16),
             justify='center'
         )
