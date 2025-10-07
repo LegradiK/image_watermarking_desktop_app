@@ -74,5 +74,5 @@ Run the app using:
 This project is licensed under the **MIT License**.
 
 ### Author
-Kaho L
+LegradiK
 GitHub: LegradiK
